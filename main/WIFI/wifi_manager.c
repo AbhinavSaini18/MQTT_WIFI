@@ -11,6 +11,8 @@
 static const char *TAG = "WIFI";
 static bool mqtt_started = false;
 static wifi_ap_record_t ap_info;
+static char pending_ssid[32];
+static char pending_password[64];
 static void wifi_event_handler(
     void *arg,
     esp_event_base_t event_base,
@@ -21,8 +23,22 @@ void wifi_manager_connect(const char *ssid,
 {
     wifi_config_t wifi_config = {0};
 
+    /* Save credentials temporarily */
+    strncpy(pending_ssid,
+            ssid,
+            sizeof(pending_ssid) - 1);
+
+    strncpy(pending_password,
+            password,
+            sizeof(pending_password) - 1);
+
+    pending_ssid[sizeof(pending_ssid) - 1] = '\0';
+    pending_password[sizeof(pending_password) - 1] = '\0';
+
+    /* Stop WiFi before changing config */
     esp_wifi_stop();
 
+    /* Copy credentials to WiFi config */
     strncpy((char *)wifi_config.sta.ssid,
             ssid,
             sizeof(wifi_config.sta.ssid) - 1);
@@ -31,6 +47,8 @@ void wifi_manager_connect(const char *ssid,
             password,
             sizeof(wifi_config.sta.password) - 1);
 
+    wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 
     ESP_ERROR_CHECK(
@@ -38,29 +56,9 @@ void wifi_manager_connect(const char *ssid,
             WIFI_IF_STA,
             &wifi_config));
 
-    // ESP_ERROR_CHECK(esp_wifi_start());
-
-    // ESP_ERROR_CHECK(esp_wifi_connect());
     ESP_ERROR_CHECK(esp_wifi_start());
 
-uint16_t ap_count = 20;
-wifi_ap_record_t ap_records[20];
-
-ESP_ERROR_CHECK(esp_wifi_scan_start(NULL, true));
-ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&ap_count, ap_records));
-
-ESP_LOGI(TAG, "Found %d APs", ap_count);
-
-for (int i = 0; i < ap_count; i++)
-{
-    ESP_LOGI(TAG,
-             "AP[%d] = %s RSSI=%d",
-             i,
-             (char *)ap_records[i].ssid,
-             ap_records[i].rssi);
-}
-
-ESP_ERROR_CHECK(esp_wifi_connect());
+    ESP_ERROR_CHECK(esp_wifi_connect());
 
     ESP_LOGI(TAG,
              "Connecting to %s",
@@ -129,22 +127,29 @@ static void wifi_event_handler(
             break;
         }
     }
-    else if (event_base == IP_EVENT &&
-             event_id == IP_EVENT_STA_GOT_IP)
+   else if (event_base == IP_EVENT &&
+         event_id == IP_EVENT_STA_GOT_IP)
+{
+    ip_event_got_ip_t *event =
+        (ip_event_got_ip_t *)event_data;
+
+    ESP_LOGI(TAG,
+             "Got IP: " IPSTR,
+             IP2STR(&event->ip_info.ip));
+
+    save_wifi_credentials(
+        pending_ssid,
+        pending_password);
+
+    ESP_LOGI(TAG,
+             "Credentials saved to NVS");
+
+    if (!mqtt_started)
     {
-        ip_event_got_ip_t *event =
-            (ip_event_got_ip_t *)event_data;
-
-        ESP_LOGI(TAG,
-                 "Got IP: " IPSTR,
-                 IP2STR(&event->ip_info.ip));
-
-        if (!mqtt_started)
-        {
-            mqtt_start();
-            mqtt_started = true;
-        }
+        mqtt_start();
+        mqtt_started = true;
     }
+}
 }
 
 

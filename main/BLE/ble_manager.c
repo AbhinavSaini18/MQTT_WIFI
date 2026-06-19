@@ -39,7 +39,7 @@
         {
             printf("SSID = %s\n", ssid);
             printf("PASSWORD = %s\n", password);
-            save_wifi_credentials(ssid, password);
+            
             wifi_manager_connect(ssid, password);
         }
         else
