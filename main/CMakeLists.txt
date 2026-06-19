@@ -1,6 +1,16 @@
 idf_component_register(
-    SRCS "mqtt_manager.c" "wifi_manager.c" "ble_manager.c" "main.c"
-    INCLUDE_DIRS "."
+    SRCS
+        "main.c"
+        "wifi/wifi_manager.c"
+        "ble/ble_manager.c"
+        "mqtt/mqtt_manager.c"
+
+    INCLUDE_DIRS
+        "."
+        "wifi"
+        "ble"
+        "mqtt"
+
     REQUIRES
         bt
         nvs_flash
@@ -8,5 +18,4 @@ idf_component_register(
         esp_event
         esp_netif
         mqtt
-        
-)
+)   
