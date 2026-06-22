@@ -1,9 +1,7 @@
-#include "mqtt_client.h"
-#include "esp_log.h"
-#include <stdbool.h>
-
 #include "mqtt_manager.h"
 #include "keys.h"
+#include "mqtt_client.h"
+#include "esp_log.h"
 
 static const char *TAG = "MQTT";
 static esp_mqtt_client_handle_t client;

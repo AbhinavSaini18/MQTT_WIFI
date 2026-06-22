@@ -1,29 +1,23 @@
+#include "wifi_manager.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_netif.h"
-#include "nvs_flash.h"
 #include "esp_log.h"
-#include "nvs.h"
-#include <stdbool.h>
-#include <stddef.h>
-#include <string.h>
-
-#include "wifi_manager.h"
-#include "mqtt_manager.h"
 #include "keys.h"
-
+#include "nvs.h"
+#include <string.h>
+#include "nvs_flash.h"
+#include "mqtt_manager.h"
 static const char *TAG = "WIFI";
 static bool mqtt_started = false;
 static wifi_ap_record_t ap_info;
 static char pending_ssid[32];
 static char pending_password[64];
-
 static void wifi_event_handler(
     void *arg,
     esp_event_base_t event_base,
     int32_t event_id,
     void *event_data);
-
 void wifi_manager_connect(const char *ssid,
                           const char *password)
 {
