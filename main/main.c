@@ -1,8 +1,9 @@
-#include <stdio.h>  
 #include "nvs_flash.h"
 #include "esp_netif.h"
 #include "esp_event.h"
 #include "esp_log.h"
+#include <stdio.h>  
+
 #include "wifi_manager.h"
 #include "ble_manager.h"
 #include "mqtt_manager.h"
@@ -60,8 +61,7 @@ void app_main(void)
                 {
                     printf("Publish ID = %d\n", msg_id);
                 }
-                }
-
-            vTaskDelay(pdMS_TO_TICKS(3500));
-        }
+            }
+        vTaskDelay(pdMS_TO_TICKS(3500));
+    }
 }

@@ -1,4 +1,7 @@
+#include "driver/gpio.h"
+
 #include "gpio_manager.h"
+#include "keys.h"
 
 void gpio_manager_init(void)
 {
