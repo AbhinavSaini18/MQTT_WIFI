@@ -1,7 +1,6 @@
-#ifndef WIFI_CONFIG_H
-#define WIFI_CONFIG_H
+#ifndef WIFI_MANAGER_H
+#define WIFI_MANAGER_H
 
-#include <string.h>
 #include <stdbool.h>
 #include <stddef.h>
 

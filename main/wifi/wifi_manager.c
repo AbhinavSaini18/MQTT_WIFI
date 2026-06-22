@@ -1,15 +1,13 @@
 #include "wifi_manager.h"
-#include "mqtt_manager.h"
-#include "keys.h"
-
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_log.h"
+#include "keys.h"
 #include "nvs.h"
-#include "nvs_flash.h"
 #include <string.h>
-
+#include "nvs_flash.h"
+#include "mqtt_manager.h"
 static const char *TAG = "WIFI";
 static bool mqtt_started = false;
 static wifi_ap_record_t ap_info;
